@@ -16,8 +16,8 @@ final class ZDL_E_List_Items_Per_Page extends ZDL_Enum_Display {
 	 *
 	 * @return string
 	 */
-	public static function get_display_name( $list_items_per_page ){
-		switch( $list_items_per_page ){
+	public static function get_display_name( $list_items_per_page ) {
+		switch( $list_items_per_page ) {
 			case self::ITEMS_10:
 				return __( '10', 'zdl' );
 			case self::ITEMS_20:

@@ -4,6 +4,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once( dirname( __FILE__ ) . '/helper/bootstrap.php' );
-require_once( dirname( __FILE__ ) . '/enum/bootstrap.php' );
-require_once( dirname( __FILE__ ) . '/dao/bootstrap.php' );
+require_once( __DIR__ . '/helper/bootstrap.php' );
+require_once( __DIR__ . '/enum/bootstrap.php' );
+require_once( __DIR__ . '/dao/bootstrap.php' );

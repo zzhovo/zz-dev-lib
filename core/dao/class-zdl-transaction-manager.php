@@ -13,8 +13,8 @@ final class ZDL_Transaction_Manager {
 	/**
 	 * @return ZDL_Transaction_Manager
 	 */
-	public static function get_instance(){
-		if( null === self::$instance ){
+	public static function get_instance() {
+		if( null === self::$instance ) {
 			self::$instance = new self();
 		}
 
@@ -33,14 +33,14 @@ final class ZDL_Transaction_Manager {
 	/**
 	 * @return bool
 	 */
-	public function is_started(){
+	public function is_started() {
 		return $this->started;
 	}
 
-	public function start(){
+	public function start() {
 		global $wpdb;
 
-		if( $this->started ){
+		if( $this->started ) {
 			throw new LogicException('Transaction is already started');
 		}
 
@@ -49,10 +49,10 @@ final class ZDL_Transaction_Manager {
 		$wpdb->query('START TRANSACTION');
 	}
 
-	public function commit(){
+	public function commit() {
 		global $wpdb;
 
-		if( ! $this->started ){
+		if( ! $this->started ) {
 			throw new LogicException('Transaction is not started');
 		}
 
@@ -61,10 +61,10 @@ final class ZDL_Transaction_Manager {
 		$wpdb->query('COMMIT');
 	}
 
-	public function rollback(){
+	public function rollback() {
 		global $wpdb;
 
-		if( ! $this->started ){
+		if( ! $this->started ) {
 			throw new LogicException('Transaction is not started');
 		}
 

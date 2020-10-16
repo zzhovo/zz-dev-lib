@@ -22,8 +22,8 @@ final class ZDL_Plugin_Config {
 	/**
 	 * @return ZDL_Plugin_Config
 	 */
-	static public function get_instance(){
-		if( null === self::$instance ){
+	static public function get_instance() {
+		if( null === self::$instance ) {
 			self::$instance = new self();
 		}
 
@@ -44,7 +44,7 @@ final class ZDL_Plugin_Config {
 	/**
 	 * @return string
 	 */
-	public function get_path(){
+	public function get_path() {
 		return $this->path;
 	}
 
@@ -55,21 +55,21 @@ final class ZDL_Plugin_Config {
 	/**
 	 * @return string
 	 */
-	public function get_url(){
+	public function get_url() {
 		return $this->url;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function get_assets_path(){
+	public function get_assets_path() {
 		return $this->get_path() . '/assets';
 	}
 
 	/**
 	 * @return string
 	 */
-	public function get_assets_url(){
+	public function get_assets_url() {
 		return $this->get_url() . '/assets';
 	}
 
@@ -80,7 +80,7 @@ final class ZDL_Plugin_Config {
 	/**
 	 * @return string
 	 */
-	public function get_assets_version(){
+	public function get_assets_version() {
 		return $this->assets_version;
 	}
 
@@ -91,7 +91,7 @@ final class ZDL_Plugin_Config {
 	/**
 	 * @return string
 	 */
-	public function get_db_table_prefix(){
+	public function get_db_table_prefix() {
 		return $this->db_table_prefix;
 	}
 }

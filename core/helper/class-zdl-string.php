@@ -42,15 +42,15 @@ final class ZDL_String {
 	 *          ' => '
 	 *          " => "
 	 */
-	static public function trim_matching_quotes( $value ){
-		if( 2 > strlen( $value ) ){
+	static public function trim_matching_quotes( $value ) {
+		if( 2 > strlen( $value ) ) {
 			return $value;
 		}
 
 		if(
 			(self::starts_with( "'", $value ) && self::ends_with( "'", $value ) )
 			|| ( self::starts_with( '"', $value ) && self::ends_with( '"', $value ) )
-		){
+		) {
 			return substr( $value, 1, -1 );
 		}
 

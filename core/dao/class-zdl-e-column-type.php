@@ -10,8 +10,8 @@ final class ZDL_E_Column_Type extends ZDL_Enum {
 	CONST BOOL = 'b';
 	CONST STRING = 's';
 
-	public static function get_format( $column_type ){
-		switch( $column_type ){
+	public static function get_format( $column_type ) {
+		switch( $column_type ) {
 			case self::FLOAT:
 				return '%f';
 				break;
@@ -28,8 +28,8 @@ final class ZDL_E_Column_Type extends ZDL_Enum {
 		}
 	}
 
-	public static function format_value( $column_type, $value ){
-		switch( $column_type ){
+	public static function format_value( $column_type, $value ) {
+		switch( $column_type ) {
 			case self::FLOAT:
 				return (float) $value;
 				break;

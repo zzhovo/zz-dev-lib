@@ -13,8 +13,8 @@ final class ZDL_List_Items_Per_Page_Resource {
 	/**
 	 * @return ZDL_List_Items_Per_Page_Resource
 	 */
-	static public function get_instance(){
-		if( null === self::$instance ){
+	static public function get_instance() {
+		if( null === self::$instance ) {
 			self::$instance = new self();
 		}
 

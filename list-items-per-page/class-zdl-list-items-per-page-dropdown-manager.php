@@ -13,14 +13,14 @@ final class ZDL_List_Items_Per_Page_Dropdown_Manager {
 	/**
 	 * @return ZDL_List_Items_Per_Page_Dropdown_Manager
 	 */
-	static public function get_instance(){
-		if( null === self::$instance ){
+	static public function get_instance() {
+		if( null === self::$instance ) {
 			self::$instance = new self();
 		}
 
 		return self::$instance;
 	}
-	private function __construct(){
+	private function __construct() {
 		add_action(
 			'wp_ajax_' . ZDL_List_Items_Per_Page_Resource::get_instance()->ajax_action_change_list_items_per_page,
 			array( $this, 'zdl_change_preference_list_items_per_page' )
@@ -37,9 +37,9 @@ final class ZDL_List_Items_Per_Page_Dropdown_Manager {
 	 * @param string    $preference_name
 	 * @param int       $selected_value
 	 */
-	public function draw_dropdown( $preference_name, $selected_value ){
+	public function draw_dropdown( $preference_name, $selected_value ) {
 		$resource = ZDL_List_Items_Per_Page_Resource::get_instance();
-		if( false === $this->nonce_already_put ){
+		if( false === $this->nonce_already_put ) {
 			$this->nonce_already_put = true;
 			wp_nonce_field( $resource->change_list_items_per_page_nonce_action, $resource->change_list_items_per_page_nonce_name, false );
 		}
@@ -47,7 +47,7 @@ final class ZDL_List_Items_Per_Page_Dropdown_Manager {
 		<label class="<?php echo $resource->switch_class; ?>" >
 			<?php echo $resource->prop_list_items_per_page; ?>
 			<select data-preference="<?php echo $preference_name; ?>" >
-				<?php foreach( ZDL_E_List_Items_Per_Page::get_all() as $value ){ ?>
+				<?php foreach( ZDL_E_List_Items_Per_Page::get_all() as $value ) { ?>
 					<option value="<?php echo $value; ?>" <?php selected( $selected_value, $value ); ?> >
 						<?php echo ZDL_E_List_Items_Per_Page::get_display_name( $value ); ?>
 					</option>
@@ -59,10 +59,10 @@ final class ZDL_List_Items_Per_Page_Dropdown_Manager {
 	/**
 	 * action callback, should not be called directly
 	 */
-	public function zdl_change_preference_list_items_per_page(){
+	public function zdl_change_preference_list_items_per_page() {
 		$resource = ZDL_List_Items_Per_Page_Resource::get_instance();
 
-		if( wp_verify_nonce( $_POST[ $resource->change_list_items_per_page_nonce_name ], $resource->change_list_items_per_page_nonce_action ) ){
+		if( wp_verify_nonce( $_POST[ $resource->change_list_items_per_page_nonce_name ], $resource->change_list_items_per_page_nonce_action ) ) {
 			do_action( $resource->action_preference_list_items_per_page_changed, $_POST['preference'], $_POST['value'] );
 		}
 
@@ -72,7 +72,7 @@ final class ZDL_List_Items_Per_Page_Dropdown_Manager {
 	/**
 	 * action callback, should not be called directly
 	 */
-	public function zdl_enqueue_list_items_per_page_scripts(){
+	public function zdl_enqueue_list_items_per_page_scripts() {
 		$plugin_config =  ZDL_Plugin_Config::get_instance();
 		$resource = ZDL_List_Items_Per_Page_Resource::get_instance();
 
