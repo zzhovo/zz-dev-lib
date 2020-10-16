@@ -13,10 +13,10 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @throws ZDL_Dao_Exception
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	public function create_single( array $entity, $replace_existing = false ){
+	public function create_single( array $entity, $replace_existing = false ) {
 		$created = $this->create_many( array( $entity ), $replace_existing );
 
-		if( false === $created ){
+		if( false === $created ) {
 			return false;
 		}
 
@@ -30,14 +30,14 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @throws ZDL_Dao_Exception
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	public function create_many( array $entities, $replace_existing = false ){
+	public function create_many( array $entities, $replace_existing = false ) {
 		global $wpdb;
 
 		// validate
-		if( 0 === count( $entities ) ){
+		if( 0 === count( $entities ) ) {
 			return 0;
 		}
-		if( ! is_array( $entities[0] ) || 0 === count( $entities[0] ) ){
+		if( ! is_array( $entities[0] ) || 0 === count( $entities[0] ) ) {
 			throw new ZDL_Dao_Exception(
 				$this->get_table_name(),
 				'each item in $entities should be array with column names and appropriate values'
@@ -47,17 +47,17 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 		// prepare ordered column names and formats
 		$column_names = array();
 		$column_formats = array();
-		foreach( $entities[0] as $column_name => $column_value ){
+		foreach( $entities[0] as $column_name => $column_value ) {
 			$column_names[] = $column_name;
 			$column_formats[] = $this->get_column_format( $column_name );
 		}
 
 		// prepare insert values
 		$query_insert_values = array();
-		foreach( $entities as $entity ){
+		foreach( $entities as $entity ) {
 			$query_insert_value = array();
-			for( $i = 0; $i < count( $column_names ); ++ $i ){
-				if( ! array_key_exists( $column_names[ $i ], $entity ) ){
+			for( $i = 0; $i < count( $column_names ); ++ $i ) {
+				if( ! array_key_exists( $column_names[ $i ], $entity ) ) {
 					throw new ZDL_Dao_Exception(
 						$this->get_table_name(),
 						'each array in $entities should contain value for column: ' . $column_names[ $i ]
@@ -71,7 +71,7 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 		$query_select = $this->prepare_columns( $column_names );
 
 		// query
-		if( true === $replace_existing ){
+		if( true === $replace_existing ) {
 			$query = '
 				REPLACE INTO `' . $this->get_table_name() . '` (' . $query_select . ')
 				VALUES ' . implode( ',', $query_insert_values ) . '
@@ -95,7 +95,7 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @throws ZDL_Dao_Exception
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	public function get_single_by_id( $id_values ){
+	public function get_single_by_id( $id_values ) {
 		return $this->get_single_properties_by_id( $id_values );
 	}
 	/**
@@ -106,16 +106,43 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @throws ZDL_Dao_Exception
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	public function get_single_properties_by_id( $id_values, array $columns = array() ){
+	public function get_single_properties_by_id( $id_values, array $columns = array() ) {
 		$id_values = $this->prepare_id_values( $id_values );
 
 		$items = $this->get_many_properties_by_values( $id_values, $columns );
 
-		if( 0 === count( $items ) ){
+		if( 0 === count( $items ) ) {
 			return false;
 		}else{
 			return $items[0];
 		}
+	}
+	/**
+	 * @param array<string, mixed>  $where_values   '{column_name}' => {value}
+	 * @param string                $column_name
+	 * @param int                   $limit          no limit will be applied in the case it's 0
+	 * @param int                   $offset
+	 *
+	 * @return mixed[]
+	 */
+	public function get_column_by_values(
+		array $where_values,
+		$column_name,
+		$limit = 0,
+		$offset = 0
+	) {
+		$results = $this->get_many_properties_by_values(
+			$where_values,
+			array( $column_name ),
+			$limit,
+			$offset
+		);
+
+		foreach( $results as & $result ) {
+			$result = $result[ $column_name ];
+		}
+
+		return $results;
 	}
 	/**
 	 * @param array<string, mixed>  $where_values   '{column_name}' => {value}
@@ -133,13 +160,13 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 		$limit = 0,
 		$offset = 0,
 		$get_count = false
-	){
+	) {
 		global $wpdb;
 
-		if( true === $get_count ){
+		if( true === $get_count ) {
 			$query_select = 'COUNT(*)';
 		}else{
-			if( 0 === count( $columns ) ){
+			if( 0 === count( $columns ) ) {
 				$columns = array( '*' );
 			}
 
@@ -149,18 +176,8 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 		$query_where = $this->prepare_where( $where_values );
 
 		$query_limit = '';
-		if( false === $get_count ){
-			if( 0 < $limit ){
-				if( 0 < $offset ){
-					$query_limit = $wpdb->prepare('
-						LIMIT %d, %d
-					', $offset, $limit );
-				}else{
-					$query_limit = $wpdb->prepare('
-						LIMIT %d
-					', $limit );
-				}
-			}
+		if( false === $get_count ) {
+			$query_limit = $this->prepare_limit_offset( $limit, $offset );
 		}
 
 		$query =
@@ -170,14 +187,14 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 			. $query_limit
 		;
 
-		if( true === $get_count ){
+		if( true === $get_count ) {
 			$count = $wpdb->get_var( $query );
 
 			return (int) $count;
 		}else{
 			$items = $wpdb->get_results( $query, ARRAY_A );
 
-			if( ! $items ){
+			if( ! $items ) {
 				$items = array();
 			}
 
@@ -194,12 +211,12 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @throws ZDL_Dao_Exception
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	public function update_single_by_id( $id_values, array $update_values ){
+	public function update_single_by_id( $id_values, array $update_values ) {
 		$id_values = $this->prepare_id_values( $id_values );
 
 		$updated = $this->update_many_by_values( $id_values, $update_values );
 
-		if( false === $updated ){
+		if( false === $updated ) {
 			return false;
 		}
 
@@ -212,14 +229,14 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @return false|int
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	public function update_many_by_values( array $where_values, array $update_values ){
+	public function update_many_by_values( array $where_values, array $update_values ) {
 		global $wpdb;
 
-		if( 0 === count( $update_values ) ){
+		if( 0 === count( $update_values ) ) {
 			return true;
 		}
 
-		if( 0 < count( $where_values ) ){
+		if( 0 < count( $where_values ) ) {
 			$where_formats = $this->get_column_formats_by_column_names( array_keys( $where_values ) );
 			$update_formats = $this->get_column_formats_by_column_names( array_keys( $update_values ) );
 
@@ -250,12 +267,12 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @return bool
 	 * @throws ZDL_Dao_Exception
 	 */
-	public function delete_single_by_id( $id_values ){
+	public function delete_single_by_id( $id_values ) {
 		$id_values = $this->prepare_id_values( $id_values );
 
 		$deleted = $this->delete_many_by_values( $id_values );
 
-		if( !! $deleted ){
+		if( !! $deleted ) {
 			return true;
 		}
 
@@ -266,7 +283,7 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 *
 	 * @return false|int
 	 */
-	public function delete_many_by_values( array $where_values ){
+	public function delete_many_by_values( array $where_values ) {
 		global $wpdb;
 
 		$where_formats = $this->get_column_formats_by_column_names( array_keys( $where_values ) );
@@ -288,41 +305,41 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @throws ZDL_Dao_Exception
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	public function delete_insert( array $where_values = array(), array $entities = array() ){
+	public function delete_insert( array $where_values = array(), array $entities = array() ) {
 		$transaction_manager = ZDL_Transaction_Manager::get_instance();
-		if( ! $transaction_manager->is_started() && 0 < count( $where_values ) && 0 < count( $entities ) ){
+		if( ! $transaction_manager->is_started() && 0 < count( $where_values ) && 0 < count( $entities ) ) {
 			$use_transaction = true;
 		}else{
 			$use_transaction = false;
 		}
 
-		if( $use_transaction ){
+		if( $use_transaction ) {
 			$transaction_manager->start();
 		}
 
-		if( 0 < count( $where_values ) ){
+		if( 0 < count( $where_values ) ) {
 			$deleted = $this->delete_many_by_values( $where_values );
 
-			if( false === $deleted ){
-				if( $use_transaction ){
+			if( false === $deleted ) {
+				if( $use_transaction ) {
 					$transaction_manager->rollback();
 				}
 				return false;
 			}
 		}
 
-		if( 0 < count( $entities ) ){
+		if( 0 < count( $entities ) ) {
 			$created = $this->create_many( $entities );
 
-			if( false === $created ){
-				if( $use_transaction ){
+			if( false === $created ) {
+				if( $use_transaction ) {
 					$transaction_manager->rollback();
 				}
 				return false;
 			}
 		}
 
-		if( $use_transaction ){
+		if( $use_transaction ) {
 			$transaction_manager->commit();
 		}
 		return true;

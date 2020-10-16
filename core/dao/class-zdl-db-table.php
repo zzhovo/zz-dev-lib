@@ -13,13 +13,13 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	/**
 	 * @param string    $table_prefix
 	 */
-	protected function set_table_prefix( $table_prefix ){
+	protected function set_table_prefix( $table_prefix ) {
 		$this->table_prefix = trim( $table_prefix );
 	}
 	/**
 	 * @return string
 	 */
-	public function get_table_prefix(){
+	public function get_table_prefix() {
 		return $this->table_prefix;
 	}
 	// endregion
@@ -32,13 +32,13 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	/**
 	 * @param string    $table_name
 	 */
-	protected function set_table_name( $table_name ){
+	protected function set_table_name( $table_name ) {
 		$this->table_name = trim( $table_name );
 	}
 	/**
 	 * @return string
 	 */
-	public function get_table_name(){
+	public function get_table_name() {
 		return $this->get_table_prefix() . $this->table_name;
 	}
 	// endregion
@@ -51,8 +51,8 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	/**
 	 * @param string|string[]   $id_column_names
 	 */
-	protected function set_id_column_names( $id_column_names ){
-		if( is_array( $id_column_names ) && 1 === count( $id_column_names ) ){
+	protected function set_id_column_names( $id_column_names ) {
+		if( is_array( $id_column_names ) && 1 === count( $id_column_names ) ) {
 			$id_column_names = $id_column_names[0];
 		}
 
@@ -61,7 +61,7 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	/**
 	 * @return string|string[]
 	 */
-	public function get_id_column_names(){
+	public function get_id_column_names() {
 		return $this->id_column_names;
 	}
 	// endregion
@@ -74,9 +74,9 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	/**
 	 * @param array<string, string> $column_types   {column name} => {ZDL_E_Column_Type constant}
 	 */
-	protected function set_column_types( $column_types ){
+	protected function set_column_types( $column_types ) {
 		$column_formats = array();
-		foreach( $column_types as $column_name => $column_type ){
+		foreach( $column_types as $column_name => $column_type ) {
 			$column_formats[ $column_name ] = ZDL_E_Column_Type::get_format( $column_type );
 		}
 		$this->column_types = $column_types;
@@ -85,7 +85,7 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	/**
 	 * @return array<string, string>
 	 */
-	public function get_column_types(){
+	public function get_column_types() {
 		return $this->column_types;
 	}
 	/**
@@ -94,8 +94,8 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @return string
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	public function get_column_type( $column_name ){
-		if( ! array_key_exists( $column_name, $this->column_types ) ){
+	public function get_column_type( $column_name ) {
+		if( ! array_key_exists( $column_name, $this->column_types ) ) {
 			throw new ZDL_Dao_Invalid_Column_Exception( $this->get_table_name(), $column_name );
 		}
 
@@ -106,7 +106,7 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 *
 	 * @return string[]
 	 */
-	public function get_column_types_by_column_names( array $column_names ){
+	public function get_column_types_by_column_names( array $column_names ) {
 		return array_map( array( $this, 'get_column_type' ), $column_names );
 	}
 	// endregion
@@ -119,7 +119,7 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	/**
 	 * @return array<string, string>
 	 */
-	public function get_column_formats(){
+	public function get_column_formats() {
 		return $this->column_formats;
 	}
 	/**
@@ -128,8 +128,8 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @return string
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	public function get_column_format( $column_name ){
-		if( ! array_key_exists( $column_name, $this->column_formats ) ){
+	public function get_column_format( $column_name ) {
+		if( ! array_key_exists( $column_name, $this->column_formats ) ) {
 			throw new ZDL_Dao_Invalid_Column_Exception( $this->get_table_name(), $column_name );
 		}
 
@@ -140,22 +140,22 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 *
 	 * @return string[]
 	 */
-	public function get_column_formats_by_column_names( array $column_names ){
+	public function get_column_formats_by_column_names( array $column_names ) {
 		return array_map( array( $this, 'get_column_format' ), $column_names );
 	}
 	// endregion
 
-	// region prepare helpers
+	// region helpers
 	/**
 	 * @param array<string, mixed>|mixed      $id_values
 	 *
 	 * @return array<string, mixed>
 	 * @throws ZDL_Dao_Exception
 	 */
-	public function prepare_id_values( $id_values ){
+	public function prepare_id_values( $id_values ) {
 		$id_column_names = $this->get_id_column_names();
-		if( is_array( $id_column_names ) ){
-			if( ! is_array( $id_values ) || count( $id_values ) !== count( $id_column_names ) ){
+		if( is_array( $id_column_names ) ) {
+			if( ! is_array( $id_values ) || count( $id_values ) !== count( $id_column_names ) ) {
 				throw new ZDL_Dao_Exception(
 					$this->get_table_name(),
 					'given $id_values does not match with the id columns'
@@ -163,8 +163,8 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 			}
 
 			$prepared_id_values = array();
-			foreach( $id_column_names as $column_name ){
-				if( ! array_key_exists( $column_name, $id_values ) ){
+			foreach( $id_column_names as $column_name ) {
+				if( ! array_key_exists( $column_name, $id_values ) ) {
 					throw new ZDL_Dao_Exception(
 						$this->get_table_name(),
 						'given $id_values should contain value for ' . $column_name
@@ -175,8 +175,8 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 
 			return $prepared_id_values;
 		}else{
-			if( is_array( $id_values ) ){
-				if( 1 < count( $id_values ) ){
+			if( is_array( $id_values ) ) {
+				if( 1 < count( $id_values ) ) {
 					throw new ZDL_Dao_Exception(
 						$this->get_table_name(),
 						'given $id_values does not match with the id column(s)'
@@ -195,11 +195,11 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @return string
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	protected function prepare_where( array $values ){
+	protected function prepare_where( array $values ) {
 		global $wpdb;
 
 		$query_where = '';
-		foreach( $values as $column_name => $column_value ){
+		foreach( $values as $column_name => $column_value ) {
 			$prepared_column_name = $this->prepare_column_name( $column_name );
 			if ( null === $column_value ) {
 				$query_where .= ' AND ' . $prepared_column_name . ' IS NULL ';
@@ -218,11 +218,11 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @return string
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	protected function prepare_update_set( array $values ){
+	protected function prepare_update_set( array $values ) {
 		global $wpdb;
 
 		$query_update_values = array();
-		foreach( $values as $column_name => $column_value ){
+		foreach( $values as $column_name => $column_value ) {
 			$prepared_column_name = $this->prepare_column_name( $column_name );
 			if ( null === $column_value ) {
 				$query_update_values[] = $prepared_column_name . ' = NULL ';
@@ -241,14 +241,14 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @return string
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	protected function prepare_columns( array $column_names ){
-		if( 0 === count( $column_names ) ){
+	protected function prepare_columns( array $column_names ) {
+		if( 0 === count( $column_names ) ) {
 			return '*';
 		}
 
 		$query_select_columns = array();
-		foreach( $column_names as $column_name ){
-			if( trim( $column_name ) === '*' ){
+		foreach( $column_names as $column_name ) {
+			if( trim( $column_name ) === '*' ) {
 				$query_select_columns[] = ' * ';
 			}else{
 				$query_select_columns[] = $this->prepare_column_name( $column_name );
@@ -265,10 +265,10 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @return string
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	protected function prepare_column_name( $column_name ){
+	protected function prepare_column_name( $column_name ) {
 		global $wpdb;
 
-		if( ! array_key_exists( $column_name, $this->column_types ) ){
+		if( ! array_key_exists( $column_name, $this->column_types ) ) {
 			throw new ZDL_Dao_Invalid_Column_Exception( $this->get_table_name(), $column_name );
 		}
 
@@ -279,16 +279,52 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 		return $prepared_column_name;
 	}
 
+	protected function prepare_limit_offset( $limit = 0, $offset = 0 ) {
+		global $wpdb;
+
+		$query_limit = '';
+		if( 0 < $limit ) {
+			if( 0 < $offset ) {
+				$query_limit = $wpdb->prepare('
+						LIMIT %d, %d
+					', $offset, $limit );
+			} else {
+				$query_limit = $wpdb->prepare('
+						LIMIT %d
+					', $limit );
+			}
+		}
+
+		return $query_limit;
+	}
+
 	/**
 	 * @param array< array<string, mixed> > $items
 	 *
 	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
-	protected function reformat_db_values( array & $items ){
-		foreach( $items as & $item ){
-			foreach( $item as $column_name => $column_value ){
+	protected function reformat_db_values( array & $items ) {
+		foreach( $items as & $item ) {
+			foreach( $item as $column_name => $column_value ) {
+				if( null === $column_value ) {
+					$item[ $column_name ] = null;
+				} else {
+					$item[ $column_name ] = ZDL_E_Column_Type::format_value(
+						$this->get_column_type( $column_name ),
+						$column_value
+					);
+				}
+			}
+		}
+	}
+	protected function reformat_db_values_by_formats( array & $items, array $column_types ) {
+		foreach( $items as & $item ) {
+			foreach( $item as $column_name => $column_value ) {
+				if( ! array_key_exists( $column_name, $column_types ) ) {
+					throw new InvalidArgumentException('could not find format for column: ' . $column_name );
+				}
 				$item[ $column_name ] = ZDL_E_Column_Type::format_value(
-					$this->get_column_type( $column_name ),
+					$column_types[ $column_name ],
 					$column_value
 				);
 			}
