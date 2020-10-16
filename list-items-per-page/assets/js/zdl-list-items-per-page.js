@@ -1,11 +1,12 @@
 jQuery(function(){
-	var _lock = false;
+	var locker = new ZDL_Locker();
+
 	jQuery('.' + zdl_list_items_per_page_data.switch_container_class + ' select').change(function(){
-		if(false === _lock){
-			_lock = true;
-		}else{
+
+		if(locker.is_locked()){
 			return;
 		}
+		locker.lock();
 
 		var data = {
 			'action':       zdl_list_items_per_page_data.change_action,
@@ -21,7 +22,7 @@ jQuery(function(){
 			data: data,
 			success: function(response){
 				location.reload();
-				_lock = false;
+				locker.unlock();
 			}
 		});
 	});
