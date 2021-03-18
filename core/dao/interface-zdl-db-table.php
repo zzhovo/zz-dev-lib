@@ -28,7 +28,6 @@ interface ZDL_I_DB_Table {
 	 * @param string        $column_name
 	 *
 	 * @return string
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function get_column_type( $column_name );
 	/**
@@ -46,7 +45,6 @@ interface ZDL_I_DB_Table {
 	 * @param string    $column_name
 	 *
 	 * @return string
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function get_column_format( $column_name );
 	/**
@@ -60,7 +58,6 @@ interface ZDL_I_DB_Table {
 	 * @param array<string, mixed>|mixed      $id_values
 	 *
 	 * @return array<string, mixed>
-	 * @throws ZDL_Dao_Exception
 	 */
 	public function prepare_id_values( $id_values );
 }

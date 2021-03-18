@@ -45,7 +45,7 @@ final class ZDL_User_Preference_Dao extends ZDL_Dao implements ZDL_I_User_Prefer
 	 * @param $user_id
 	 */
 	protected function cache_user_preferences( $user_id ) {
-		$preferences = $this->get_many_properties_by_values( array( 'user_id' => $user_id ), array( 'name', 'value' ) );
+		$preferences = $this->get_many_properties_by_values( array( array( 'user_id', $user_id ) ), array( 'name', 'value' ) );
 
 		$this->user_preferences[ $user_id ] = array();
 

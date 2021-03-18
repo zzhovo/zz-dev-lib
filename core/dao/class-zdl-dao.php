@@ -10,8 +10,6 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @param bool                  $replace_existing
 	 *
 	 * @return int
-	 * @throws ZDL_Dao_Exception
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function create_single( array $entity, $replace_existing = false ) {
 		$created = $this->create_many( array( $entity ), $replace_existing );
@@ -27,8 +25,6 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @param bool                              $replace_existing
 	 *
 	 * @return false|int
-	 * @throws ZDL_Dao_Exception
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function create_many( array $entities, $replace_existing = false ) {
 		global $wpdb;
@@ -89,27 +85,28 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	}
 
 	/**
-	 * @param array<string, mixed>|mixed    $id_values
+	 * @param array<string, mixed>|mixed    $id_values  {column_name} => {value}
 	 *
 	 * @return false|array<string, mixed>
-	 * @throws ZDL_Dao_Exception
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function get_single_by_id( $id_values ) {
 		return $this->get_single_properties_by_id( $id_values );
 	}
 	/**
-	 * @param array<string, mixed>|mixed    $id_values
+	 * @param array<string, mixed>|mixed    $id_values  {column_name} => {value}
 	 * @param string[]                      $columns    all the columns will be selected, in the case it's an empty array
 	 *
 	 * @return false|array<string, mixed>
-	 * @throws ZDL_Dao_Exception
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function get_single_properties_by_id( $id_values, array $columns = array() ) {
 		$id_values = $this->prepare_id_values( $id_values );
 
-		$items = $this->get_many_properties_by_values( $id_values, $columns );
+		$where_values = array();
+		foreach( $id_values as $column_name => $column_value ) {
+			$where_values[] = array( $column_name, $column_value );
+		}
+
+		$items = $this->get_many_properties_by_values( $where_values, $columns );
 
 		if( 0 === count( $items ) ) {
 			return false;
@@ -118,7 +115,8 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 		}
 	}
 	/**
-	 * @param array<string, mixed>  $where_values   '{column_name}' => {value}
+	 * @param array<string, mixed>[]|array<string, string, mixed>[] $where_values   '{column_name}', {value}
+	 *                                                                              '{operation}', '{column_name}', {value}|<{value}>
 	 * @param string                $column_name
 	 * @param int                   $limit          no limit will be applied in the case it's 0
 	 * @param int                   $offset
@@ -145,14 +143,14 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 		return $results;
 	}
 	/**
-	 * @param array<string, mixed>  $where_values   '{column_name}' => {value}
+	 * @param array<string, mixed>[]|array<string, string, mixed>[] $where_values   '{column_name}', {value}
+	 *                                                                              '{operation}', '{column_name}', {value}|<{value}>
 	 * @param string[]              $columns        all the columns will be selected, in the case it's an empty array
 	 * @param int                   $limit          no limit will be applied in the case it's 0
 	 * @param int                   $offset
 	 * @param bool                  $get_count
 	 *
 	 * @return array|int                            an int will be returned in the case the $get_count is true
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function get_many_properties_by_values(
 		array $where_values,
@@ -208,8 +206,6 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @param array<string, mixed>          $update_values  '{column_name}' => {value}
 	 *
 	 * @return bool
-	 * @throws ZDL_Dao_Exception
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function update_single_by_id( $id_values, array $update_values ) {
 		$id_values = $this->prepare_id_values( $id_values );
@@ -227,7 +223,6 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @param array<string, mixed>  $update_values  '{column_name}' => {value}
 	 *
 	 * @return false|int
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function update_many_by_values( array $where_values, array $update_values ) {
 		global $wpdb;
@@ -265,7 +260,6 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @param array<string, mixed>|mixed  $id_values
 	 *
 	 * @return bool
-	 * @throws ZDL_Dao_Exception
 	 */
 	public function delete_single_by_id( $id_values ) {
 		$id_values = $this->prepare_id_values( $id_values );
@@ -302,8 +296,6 @@ abstract class ZDL_Dao extends ZDL_DB_Table implements ZDL_I_Dao {
 	 * @param array< array<string, mixed> >     $entities       '{column_name}' => {value}
 	 *
 	 * @return bool
-	 * @throws ZDL_Dao_Exception
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function delete_insert( array $where_values = array(), array $entities = array() ) {
 		$transaction_manager = ZDL_Transaction_Manager::get_instance();

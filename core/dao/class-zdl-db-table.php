@@ -92,7 +92,6 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @param string        $column_name
 	 *
 	 * @return string
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function get_column_type( $column_name ) {
 		if( ! array_key_exists( $column_name, $this->column_types ) ) {
@@ -126,7 +125,6 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @param string    $column_name
 	 *
 	 * @return string
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	public function get_column_format( $column_name ) {
 		if( ! array_key_exists( $column_name, $this->column_formats ) ) {
@@ -145,12 +143,11 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	}
 	// endregion
 
-	// region helpers
+	// region Helpers
 	/**
 	 * @param array<string, mixed>|mixed      $id_values
 	 *
 	 * @return array<string, mixed>
-	 * @throws ZDL_Dao_Exception
 	 */
 	public function prepare_id_values( $id_values ) {
 		$id_column_names = $this->get_id_column_names();
@@ -158,7 +155,7 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 			if( ! is_array( $id_values ) || count( $id_values ) !== count( $id_column_names ) ) {
 				throw new ZDL_Dao_Exception(
 					$this->get_table_name(),
-					'given $id_values does not match with the id columns'
+					'given $id_values does not match with the id column  names'
 				);
 			}
 
@@ -190,23 +187,35 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	}
 
 	/**
-	 * @param array<string, mixed>  $values  '{column_name}' => {value}
+	 * @param array<string, mixed>[]|array<string, string, mixed>[] $values '{column_name}', {value}
+	 *                                                                      '{operation}', '{column_name}', {value}|<{value}>
 	 *
 	 * @return string
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	protected function prepare_where( array $values ) {
-		global $wpdb;
-
 		$query_where = '';
-		foreach( $values as $column_name => $column_value ) {
-			$prepared_column_name = $this->prepare_column_name( $column_name );
-			if ( null === $column_value ) {
-				$query_where .= ' AND ' . $prepared_column_name . ' IS NULL ';
-			}else{
-				$format = $this->get_column_format( $column_name );
-				$query_where .= ' AND ' . $prepared_column_name . $wpdb->prepare(' = ' . $format, $column_value ) . ' ';
+		foreach( $values as $column_value ) {
+			if( ! is_array( $column_value ) ) {
+				throw new InvalidArgumentException('Each item in $values should be array');
 			}
+
+			if( 2 === count( $column_value ) ) {
+				$operator = ZDL_E_DB_Value_Comparison_Operator::O_AND;
+				$column_name = $column_value[0];
+				$column_value = $column_value[1];
+			} else {
+				ZDL_E_DB_Value_Comparison_Operator::validate_item( $column_value[0] );
+				$operator = $column_value[0];
+				$column_name = $column_value[1];
+				$column_value = $column_value[2];
+			}
+
+			$query_where .= ZDL_E_DB_Value_Comparison_Operator::prepare(
+				$operator,
+				$this->prepare_column_name( $column_name ),
+				$this->get_column_format( $column_name ),
+				$column_value
+			);
 		}
 
 		return $query_where;
@@ -216,7 +225,6 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @param array<string, mixed> $values '{column_name}' => {value}
 	 *
 	 * @return string
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	protected function prepare_update_set( array $values ) {
 		global $wpdb;
@@ -239,7 +247,6 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @param string[]  $column_names
 	 *
 	 * @return string
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	protected function prepare_columns( array $column_names ) {
 		if( 0 === count( $column_names ) ) {
@@ -263,7 +270,6 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 	 * @param string        $column_name
 	 *
 	 * @return string
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	protected function prepare_column_name( $column_name ) {
 		global $wpdb;
@@ -300,8 +306,6 @@ abstract class ZDL_DB_Table implements ZDL_I_DB_Table {
 
 	/**
 	 * @param array< array<string, mixed> > $items
-	 *
-	 * @throws ZDL_Dao_Invalid_Column_Exception
 	 */
 	protected function reformat_db_values( array & $items ) {
 		foreach( $items as & $item ) {
